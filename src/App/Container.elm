@@ -104,7 +104,7 @@ view id container daemons =
                     , Util.showIf (container.memory >= 32000 || container.showExtraMemory) (Util.viewFormCheckbox "Show more memory options" "" container.showExtraMemory (ToggleMoreMemory id))
                     , Util.viewFormRowSlider "Memory" (Util.formatMegabytes container.memory) container.memory 250 (determineMaxContainerMemory container.showExtraMemory) (determineContainerMemStep container.showExtraMemory) (UpdateMemory id)
                     , hr [] []
-                    , Util.viewFormCheckbox "Use Elastic Block Storage / Managed Disks" "" container.useEBS (UpdateEBS id)
+                    , Util.viewFormCheckbox "Persistent Storage" "" container.useEBS (UpdateEBS id)
                     , Util.viewFormRowSlider "IOOPs" ((String.fromInt <| container.ioops) ++ " MiB/sec") container.ioops 4750 19000 1000 (UpdateIoops id)
                     , hr [] []
                     , Util.viewFormRowSlider "Bandwidth" ((String.fromInt <| container.bandwidth) ++ " GiB/sec") container.bandwidth 1 25 1 (UpdateBandwidth id)
