@@ -13,7 +13,7 @@ app.ports.requestInstances.subscribe(function ( message ) {
       region: message[0],
       apiVersion: '2017-10-15',
       accessKeyId: process.env.ELM_APP_ACCESS_KEY_ID,
-      secretAccessKey: process.env.ELM_APP_SERCRET_ACCESS_KEY
+      secretAccessKey: process.env.ELM_APP_SECRET_ACCESS_KEY
    });
    let nextToken = message[1];
    let maxResults = message[2];

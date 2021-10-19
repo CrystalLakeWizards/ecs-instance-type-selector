@@ -67,6 +67,8 @@ type Detail
     | Task Int
     | Container Int
     | Settings
+    | ImportYaml
+    | ExportYaml
 
 
 
@@ -186,6 +188,8 @@ urlParser =
         , Url.map Container (Url.s "container" </> Url.int)
         , Url.map Task (Url.s "task" </> Url.int)
         , Url.map Settings (Url.s "settings")
+        , Url.map ImportYaml (Url.s "load")
+        , Url.map ExportYaml (Url.s "export")
         ]
 
 
@@ -298,9 +302,24 @@ viewDetail model =
         Settings ->
             Html.map SettingsMsg (Settings.view model.settings)
 
+        ImportYaml ->
+            viewImportDetail
+
+        ExportYaml ->
+            viewExportDetail
+
         _ ->
             viewNoneDetail
 
+viewImportDetail : Html Msg
+viewImportDetail =
+    span [ class "text-muted align-middle" ]
+        [ text "Importing a Yaml file with Kubernetes cluster data allows you to auto-fill the settings." ]
+
+viewExportDetail : Html Msg
+viewExportDetail =
+    span [ class "text-muted align-middle" ]
+        [ text "Exporting a Yaml file allows you to save your settings as a Kubernetes cluster configuration" ]
 
 viewNoneDetail : Html Msg
 viewNoneDetail =

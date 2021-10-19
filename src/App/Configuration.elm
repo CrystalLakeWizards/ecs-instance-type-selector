@@ -181,6 +181,9 @@ update msg model =
         ChangeClusterName id value ->
             { model | clusters = Dict.update id (Maybe.map (\cluster -> { cluster | name = value })) model.clusters }
 
+        --ExportYaml ->
+        --    {model | }
+
 view : Model -> Html Msg
 view model =
     div [ class "px-3", class "pt-1" ]
@@ -192,11 +195,11 @@ view model =
         , hr [] []
         , ListGroup.custom
             [ simpleListItem "Filters" FeatherIcons.filter [ href "settings" ]
-            , simpleListItem "Export JSON" FeatherIcons.share [ href "#" ]
-            , simpleListItem "Load JSON" FeatherIcons.download [ href "#" ]
+            , simpleListItem "Export Yaml" FeatherIcons.share [ href "export" ]
+            , simpleListItem "Load Yaml" FeatherIcons.download [ href "load" ]
             ]
         ]
-
+-- Radio.create [ Radio.id "ondemand", Radio.checked (model.preferredPricing == OnDemandPricing), Radio.onClick (SetPricingPreference OnDemandPricing) ] "On-Demand"
 
 viewClusters : Model -> Html Msg
 viewClusters model =
