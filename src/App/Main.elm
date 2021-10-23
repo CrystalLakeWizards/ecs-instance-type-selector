@@ -306,7 +306,7 @@ viewDetail model =
             viewImportDetail
 
         ExportYaml ->
-            viewExportDetail
+            viewExportDetail model
 
         _ ->
             viewNoneDetail
@@ -316,10 +316,12 @@ viewImportDetail =
     span [ class "text-muted align-middle" ]
         [ text "Importing a Yaml file with Kubernetes cluster data allows you to auto-fill the settings." ]
 
-viewExportDetail : Html Msg
-viewExportDetail =
+viewExportDetail : Model -> Html Msg
+viewExportDetail model =
     span [ class "text-muted align-middle" ]
-        [ text "Exporting a Yaml file allows you to save your settings as a Kubernetes cluster configuration" ]
+        --[ text ("services: " ++ (Debug.toString (Dict.get 1 model.configuration.services))) ] --Dict.get id model.configuration.clusters
+        [ text ("services: " ++ Debug.toString (( Dict.map (\key value -> value) model.configuration.services ))) ] --Dict.get id model.configuration.clusters
+
 
 viewNoneDetail : Html Msg
 viewNoneDetail =
