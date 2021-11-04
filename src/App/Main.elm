@@ -318,9 +318,11 @@ viewImportDetail =
 
 viewExportDetail : Model -> Html Msg
 viewExportDetail model =
-    span [ class "text-muted align-middle" ]
+    pre [ class "text-muted align-middle" ]
         --[ text ("services: " ++ (Debug.toString (Dict.get 1 model.configuration.services))) ] --Dict.get id model.configuration.clusters
-        [ text ("services: " ++ Debug.toString (( Dict.map (\key value -> value) model.configuration.services ))) ] --Dict.get id model.configuration.clusters
+        [ text ("services: " ++ Debug.toString (( Dict.map (\key value -> value) model.configuration.services ))
+        ++ "\nhowdy") ] --Dict.get id model.configuration.clusters
+
 
 
 viewNoneDetail : Html Msg

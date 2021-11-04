@@ -64,6 +64,7 @@ type Msg
     | ChangeDaemonName Int String -- DaemonId Name
     | ChangeServiceName Int String -- ServiceId Name
     | ChangeClusterName Int String -- ClusterId Name
+    --| ExportYaml
 
 
 type PricingFilter
@@ -180,6 +181,9 @@ update msg model =
             
         ChangeClusterName id value ->
             { model | clusters = Dict.update id (Maybe.map (\cluster -> { cluster | name = value })) model.clusters }
+
+        --ExportYaml ->
+        --    {}
 
         --ExportYaml ->
         --    {model | }
