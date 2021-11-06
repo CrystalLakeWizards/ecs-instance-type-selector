@@ -88,22 +88,23 @@ sumBandwidth containers =
 
 sumIoops : Configuration.Controller -> Configuration.Containers -> String
 sumIoops controller containers =
+    --     -- This feels like a lot of duplicated code
+    --     --containersWithEBS =
+    --       --  List.filter (\container -> container.useEBS == True) (Dict.values containers)
+    --
+    --     --containersWoEBS =
+    --         --List.filter (\container -> container.useEBS == False) (Dict.values containers)
+    --
+    --
+    --     --someUseEBS =
+    --
     let
-        -- This feels like a lot of duplicated code
-        containersWithEBS =
-            List.filter (\container -> container.useEBS == True) (Dict.values containers)
-
-        containersWoEBS =
-            List.filter (\container -> container.useEBS == False) (Dict.values containers)
-
-        otherSum =
-            List.sum (List.map (\container -> container.ioops) (Dict.values containers))
-
-        someUseEBS =
-            List.length containersWithEBS > 0
+      otherSum =
+        List.sum (List.map (\container -> container.ioops) (Dict.values containers))
+      --List.length containersWithEBS > 0
     in
-    if someUseEBS then
-        String.fromInt (List.length containersWithEBS) ++ " container(s) using EBS. Total: " ++ String.fromInt otherSum ++ "MiB/sec"
+    -- if 0 == 0 then
+    --     String.fromInt (List.length containersWithEBS) ++ " container(s) using EBS. Total: " ++ String.fromInt otherSum ++ "MiB/sec"
 
-    else
-        String.fromInt (otherSum * controller.nominalPods) ++ " MiB/sec"
+    --else
+      String.fromInt (otherSum * controller.nominalPods) ++ " MiB/sec"

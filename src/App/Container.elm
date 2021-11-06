@@ -20,7 +20,9 @@ type Msg
     = UpdateCPUShare Int String
     | UpdateMemory Int String
     | UpdateIoops Int String
-    | UpdateEBS Int Bool
+    | UpdatePersistentStorage Int String
+    | UpdateSSD Int Bool
+    --| UpdateEBS Int Bool
     | UpdateBandwidth Int String
     | ToggleMoreMemory Int Bool
     | DaemonMsg Daemon.Msg
@@ -41,8 +43,13 @@ update msg model =
         UpdateIoops id value ->
             { model | containers = Dict.update id (Maybe.map (\container -> { container | ioops = Util.toInt value })) model.containers }
 
-        UpdateEBS id checked ->
-            { model | containers = Dict.update id (Maybe.map (\container -> { container | useEBS = checked })) model.containers }
+        UpdatePersistentStorage id value ->
+            { model | containers = Dict.update id (Maybe.map (\container -> { container | persistentStorage = Util.toInt value})) model.containers }
+
+        UpdateSSD id checked ->
+            { model | containers = Dict.update id (Maybe.map (\container -> {container | isSSD = checked })) model.containers }
+        --UpdateEBS id checked ->
+            --{ model | containers = Dict.update id (Maybe.map (\container -> { container | useEBS = checked })) model.containers }
 
         UpdateBandwidth id value ->
             { model | containers = Dict.update id (Maybe.map (\container -> { container | bandwidth = Util.toInt value })) model.containers }
@@ -104,7 +111,10 @@ view id container daemons =
                     , Util.showIf (container.memory >= 32000 || container.showExtraMemory) (Util.viewFormCheckbox "Show more memory options" "" container.showExtraMemory (ToggleMoreMemory id))
                     , Util.viewFormRowSlider "Memory" (Util.formatMegabytes container.memory) container.memory 250 (determineMaxContainerMemory container.showExtraMemory) (determineContainerMemStep container.showExtraMemory) (UpdateMemory id)
                     , hr [] []
-                    , Util.viewFormCheckbox "Persistent Storage" "" container.useEBS (UpdateEBS id)
+                    , Util.viewFormCheckbox "SSD" "" container.isSSD (UpdateSSD id)
+                    , Util.viewFormRowSlider "Persistent Storage" ((String.fromInt <| container.persistentStorage) ++ " Disks (Default HDD)") container.persistentStorage 1 20 1 (UpdatePersistentStorage id)
+                    --, Util.viewFormCheckbox "Persistent Storage" "" container.useEBS (UpdateEBS id)
+                    , hr [] []
                     , Util.viewFormRowSlider "IOOPs" ((String.fromInt <| container.ioops) ++ " MiB/sec") container.ioops 4750 19000 1000 (UpdateIoops id)
                     , hr [] []
                     , Util.viewFormRowSlider "Bandwidth" ((String.fromInt <| container.bandwidth) ++ " GiB/sec") container.bandwidth 1 25 1 (UpdateBandwidth id)
