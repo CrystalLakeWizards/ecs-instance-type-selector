@@ -1,4 +1,4 @@
-module App.Configuration exposing (Cluster, Container, Containers, Services, Daemon, Daemons, Model, Msg(..), PackingStrategy(..), Service, Clusters, PricingFilter(..), getContainers, init, update, view)
+module App.Configuration exposing (Cluster, Container, Containers, Services, Daemon, Daemons, Model, Msg(..), PackingStrategy(..), Service, Clusters, PricingFilter(..), getContainers, getServices, init, update, view)
 
 -- This is probably the only real "messy" file, could do with some refactoring and clean up
 
@@ -182,11 +182,6 @@ update msg model =
         ChangeClusterName id value ->
             { model | clusters = Dict.update id (Maybe.map (\cluster -> { cluster | name = value })) model.clusters }
 
-        --ExportYaml ->
-        --    {}
-
-        --ExportYaml ->
-        --    {model | }
 
 view : Model -> Html Msg
 view model =

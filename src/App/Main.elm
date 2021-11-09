@@ -1,7 +1,7 @@
 module App.Main exposing (..)
 
 import App.Cluster as Cluster
-import App.Configuration as Configuration
+import App.Configuration as Configuration exposing (Container)
 import App.Instances as Instances
 import App.Container as Container
 import App.Results as Results
@@ -318,12 +318,37 @@ viewImportDetail =
 
 viewExportDetail : Model -> Html Msg
 viewExportDetail model =
-    pre [ class "text-muted align-middle" ]
-        --[ text ("services: " ++ (Debug.toString (Dict.get 1 model.configuration.services))) ] --Dict.get id model.configuration.clusters
-        [ text ("services: " ++ Debug.toString (( Dict.map (\key value -> value) model.configuration.services ))
-        ++ "\nhowdy") ] --Dict.get id model.configuration.clusters
+    let
 
 
+
+
+    in
+        pre [ class "text-muted align-middle" ]
+            --[text (containerStringify cont)]
+            [ text ("containers: " ++ (List.map containerStringify contsList))]
+
+
+        --[ text ("containers: " ++ (Debug.toString (( Dict.map (\key value -> value) model.configuration.containers ))
+        --++ "\nhowdy")) ] --Dict.get id model.configuration.clusters
+
+        --[ text "---\napiVersion: v1\nkind: Deployment\nmetadata:\n  name: <replace>\nspec:\n      containers:\n      - name: <TODO>\n      image: <replace>\n      ports: <replace>\n    resources:\n      limits:\n        cpu: <TODO>\n      requests:\n        cpu: <TODO>\n"
+        --, text "\nhowdy there???"
+        --, text "\n---"]
+
+containerStringify : (Int, Container) -> String
+containerStringify container =
+    let
+        contsList =
+            Dict.toList model.configuration.containers
+
+        contTuple =
+            List.head contsList
+
+        contObject =
+            Tuple.second (Maybe.withDefault (0, {name = "String", color = "String", serviceId = 0, cpuShare = 0, memory = 0, ioops = 0, useEBS = True, bandwidth = 0, showExtraMemory = True}) contTuple)
+    in
+        ("\nname: " ++ container.name ++ "\n")
 
 viewNoneDetail : Html Msg
 viewNoneDetail =
