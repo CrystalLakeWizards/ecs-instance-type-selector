@@ -194,8 +194,8 @@ view model =
         , hr [] []
         , ListGroup.custom
             [ simpleListItem "Filters" FeatherIcons.filter [ href "settings" ]
-            , simpleListItem "Export Yaml" FeatherIcons.share [ href "export" ]
-            , simpleListItem "Load Yaml" FeatherIcons.download [ href "load" ]
+            , simpleListItem "Generate Pod File" FeatherIcons.share [ href "export" ]
+            , simpleListItem "Save Configuration" FeatherIcons.download [ href "load" ]
             ]
         ]
 -- Radio.create [ Radio.id "ondemand", Radio.checked (model.preferredPricing == OnDemandPricing), Radio.onClick (SetPricingPreference OnDemandPricing) ] "On-Demand"

@@ -67,8 +67,8 @@ type Detail
     | Task Int
     | Container Int
     | Settings
-    | ImportYaml
-    | ExportYaml
+    | GeneratePodFile
+    | SaveConfiguration
 
 
 
@@ -188,8 +188,8 @@ urlParser =
         , Url.map Container (Url.s "container" </> Url.int)
         , Url.map Task (Url.s "task" </> Url.int)
         , Url.map Settings (Url.s "settings")
-        , Url.map ImportYaml (Url.s "load")
-        , Url.map ExportYaml (Url.s "export")
+        , Url.map SaveConfiguration (Url.s "load")
+        , Url.map GeneratePodFile (Url.s "export")
         ]
 
 
@@ -302,53 +302,54 @@ viewDetail model =
         Settings ->
             Html.map SettingsMsg (Settings.view model.settings)
 
-        ImportYaml ->
-            viewImportDetail
+        SaveConfiguration ->
+            viewImportDetail model
 
-        ExportYaml ->
+        GeneratePodFile ->
             viewExportDetail model
 
         _ ->
             viewNoneDetail
 
-viewImportDetail : Html Msg
-viewImportDetail =
-    span [ class "text-muted align-middle" ]
-        [ text "Importing a Yaml file with Kubernetes cluster data allows you to auto-fill the settings." ]
+viewImportDetail : Model -> Html Msg
+viewImportDetail model =
+    pre [ class "text-muted align-middle" ]
+        [
+            text "Copy the below configuration to a text file so that you can \nreturn to your work at a later time.\n\n"
+            , text "Services:\n"
+            --, span [] (loop through services)
+            , text "Containers:\n"
+            --, span [] (loop through containers)
+            , text "Filters:\n"
+            --, span [] (print out filters no loop needed)
+        ]
 
 viewExportDetail : Model -> Html Msg
 viewExportDetail model =
     let
-
-
-
-
+        contsList = Dict.toList model.configuration.containers
     in
+
         pre [ class "text-muted align-middle" ]
-            --[text (containerStringify cont)]
-            [ text ("containers: " ++ (List.map containerStringify contsList))]
+            [
+                text "---\napiVersion: v1\nkind: Pod\nmetadata:\n  name: <ENTER NAME>\nspec:\n  containers:"
+                , span [] (List.map printCont contsList)
+                , text "---"
+            ]
 
 
-        --[ text ("containers: " ++ (Debug.toString (( Dict.map (\key value -> value) model.configuration.containers ))
-        --++ "\nhowdy")) ] --Dict.get id model.configuration.clusters
+printCont : (Int, Container) -> Html Msg
+printCont container =
+    pre [class "text-muted align-middle"]
+    [
+        text ("  - name: " ++ (second container).name ++ "\n")
+        , text ("    image: <IMAGE NAME>\n")
+        , text ("    resources:\n")
+        , text ("      requests:\n")
+        , text ("        memory: " ++ (String.fromInt (second container).memory) ++ "Mi\n")
+        , text ("        cpuShare: " ++ (String.fromInt (second container).cpuShare) ++ "m")
+    ]
 
-        --[ text "---\napiVersion: v1\nkind: Deployment\nmetadata:\n  name: <replace>\nspec:\n      containers:\n      - name: <TODO>\n      image: <replace>\n      ports: <replace>\n    resources:\n      limits:\n        cpu: <TODO>\n      requests:\n        cpu: <TODO>\n"
-        --, text "\nhowdy there???"
-        --, text "\n---"]
-
-containerStringify : (Int, Container) -> String
-containerStringify container =
-    let
-        contsList =
-            Dict.toList model.configuration.containers
-
-        contTuple =
-            List.head contsList
-
-        contObject =
-            Tuple.second (Maybe.withDefault (0, {name = "String", color = "String", serviceId = 0, cpuShare = 0, memory = 0, ioops = 0, useEBS = True, bandwidth = 0, showExtraMemory = True}) contTuple)
-    in
-        ("\nname: " ++ container.name ++ "\n")
 
 viewNoneDetail : Html Msg
 viewNoneDetail =
