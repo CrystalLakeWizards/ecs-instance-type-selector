@@ -64,7 +64,6 @@ type Msg
     | ChangeDaemonName Int String -- DaemonId Name
     | ChangeServiceName Int String -- ServiceId Name
     | ChangeClusterName Int String -- ClusterId Name
-    --| ExportYaml
 
 
 type PricingFilter
@@ -194,8 +193,8 @@ view model =
         , hr [] []
         , ListGroup.custom
             [ simpleListItem "Filters" FeatherIcons.filter [ href "settings" ]
-            , simpleListItem "Generate Pod File" FeatherIcons.share [ href "export" ]
-            , simpleListItem "Save Configuration" FeatherIcons.download [ href "load" ]
+            , simpleListItem "Generate Pod File" FeatherIcons.download [ href "export" ]
+            , simpleListItem "Generate Configuration File" FeatherIcons.download [ href "load" ]
             ]
         ]
 -- Radio.create [ Radio.id "ondemand", Radio.checked (model.preferredPricing == OnDemandPricing), Radio.onClick (SetPricingPreference OnDemandPricing) ] "On-Demand"
