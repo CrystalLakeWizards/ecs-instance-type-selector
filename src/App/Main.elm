@@ -67,6 +67,8 @@ type Detail
     | Pod Int
     | Container Int
     | Settings
+    | GeneratePodFile
+    | GenerateConfiguration
 
 
 
@@ -186,6 +188,8 @@ urlParser =
         , Url.map Container (Url.s "container" </> Url.int)
         , Url.map Pod (Url.s "pod" </> Url.int)
         , Url.map Settings (Url.s "settings")
+        , Url.map GenerateConfiguration (Url.s "load")
+        , Url.map GeneratePodFile (Url.s "export")
         ]
 
 
@@ -298,8 +302,124 @@ viewDetail model =
         Settings ->
             Html.map SettingsMsg (Settings.view model.settings)
 
+        GenerateConfiguration ->
+            viewImportDetail model
+
+        GeneratePodFile ->
+            viewExportDetail model
+
         _ ->
             viewNoneDetail
+
+
+viewImportDetail : Model -> Html Msg
+viewImportDetail model =
+    let
+        servicesList = Dict.toList model.configuration.services
+        containersList = Dict.toList model.configuration.containers
+        daemonsList = Dict.toList model.configuration.daemons
+    in
+        pre [ class "text-muted align-middle" ]
+            [
+                text "Copy the below configuration to a text file so that you can \nreturn to your work at a later time.\n\n"
+                , text "\nServices:\n"
+                , span [] (List.map printServices servicesList)
+                , text "\nContainers:\n"
+                , span [] (List.map printContainers containersList)
+                , text "\nDaemons:\n"
+                , span [] (List.map printDaemons daemonsList)
+                , text "\n\n"
+                --, text "\nFilters:\n"
+                -- TODO, span [] (print out filters no loop needed)
+            ]
+
+
+printServices : (Int, Service) -> Html Msg
+printServices service =
+    pre [class "text-muted align-middle"]
+        [
+            text ("- name: " ++ (second service).name ++ "\n")
+            , text ("  scaling-target: " ++ (String.fromInt (second service).scalingTarget) ++ "\n")
+            , text ("  packing-strategy: " ++  (printVariant (second service)).varType ++ "\n")
+            , text ("  min-tasks: " ++ (String.fromInt (second service).minTasks) ++ "\n")
+            , text ("  max-tasks: " ++ (String.fromInt (second service).maxTasks) ++ "\n")
+            , text ("  nominal-tasks: " ++ (String.fromInt (second service).nominalTasks) ++ "\n")
+        ]
+
+
+printVariant : Service -> {varType:String}
+printVariant service =
+    let
+        x = {varType = ""}
+    in
+        case service.packingStrategy of
+            Configuration.ByCPUShares ->
+                {x | varType = "By CPU Shares"}
+
+            Configuration.ByMemory ->
+                {x | varType = "By Memory"}
+
+
+printContainers : (Int, Container) -> Html Msg
+printContainers container =
+    pre [class "text-muted align-middle"]
+    [
+        text ("- name: " ++ (second container).name ++ "\n")
+        , text ("  cpuShare: " ++ (String.fromInt (second container).cpuShare) ++ "m\n")
+        , text ("  memory: " ++ (String.fromInt (second container).memory) ++ "Mi\n")
+        , text ("  IOOPs: " ++ (String.fromInt (second container).ioops) ++ "\n")
+        , text ("    use-elastic-block-storage: " ++ (printBool (second container).useEBS) ++ "\n")
+        , text ("  bandwidth: " ++ (String.fromInt (second container).bandwidth) ++ "Gi\n")
+        , text ("  service-id: " ++ (String.fromInt (second container).serviceId) ++ "\n")
+        -- TODO add service name to avoid confusion
+    ]
+
+
+printBool : Bool -> String
+printBool boolean =
+    if boolean then
+        "True"
+
+    else
+        "False"
+
+
+printDaemons : (Int, Daemon) -> Html Msg
+printDaemons daemon =
+    pre [class "text-muted align-middle"]
+    [
+        text ("- name: " ++ (second daemon).name ++ "\n")
+        , text ("  memory: " ++ (String.fromInt (second daemon).memory) ++ "Mi\n")
+        , text ("  cpuShare: " ++ (String.fromInt (second daemon).cpuShare) ++ "m\n")
+        , text ("  container-id: " ++ (String.fromInt (second daemon).containerId) ++ "\n")
+    ]
+
+
+viewExportDetail : Model -> Html Msg
+viewExportDetail model =
+    let
+        contsList = Dict.toList model.configuration.containers
+    in
+
+        pre [ class "text-muted align-middle" ]
+            [
+                text "This template is to help you create Kubernetes Pod and Deployment files.\nAll container information is presented in yaml format below.\n\n---\napiVersion: v1\nkind: Pod\nmetadata:\n  name: <ENTER NAME>\nspec:\n  containers:"
+                , span [] (List.map yamlPrintCont contsList)
+                , text "---"
+            ]
+
+
+yamlPrintCont : (Int, Container) -> Html Msg
+yamlPrintCont container =
+    pre [class "text-muted align-middle"]
+    [
+        text ("  - name: " ++ (second container).name ++ "\n")
+        , text ("    image: <IMAGE NAME>\n")
+        , text ("    resources:\n")
+        , text ("      requests:\n")
+        , text ("        memory: " ++ (String.fromInt (second container).memory) ++ "Mi\n")
+        , text ("        cpuShare: " ++ (String.fromInt (second container).cpuShare) ++ "m")
+    ]
 
 
 viewNoneDetail : Html Msg

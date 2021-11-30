@@ -21,7 +21,7 @@ init : Model
 init =
     { clusters = Dict.fromList [ ( 0, { name = "Cluster" } ) ]
     , controllers = Dict.fromList [ ]
-    , containers = Dict.fromList [ ]
+    , containers = Dict.fromList [ ] 
     , daemons = Dict.fromList [ ]
     , autoIncrement = 0 -- Set this to 0 once we get rid of sample data
     }
@@ -38,7 +38,7 @@ type alias Clusters =
 type alias Containers =
     Dict Int Container
 
-type alias Daemons =
+type alias Daemons = 
     Dict Int Daemon
 
 
@@ -107,7 +107,7 @@ type alias Container =
     }
 
 
-type alias Daemon =
+type alias Daemon = 
     { memory: Int
     , cpuShare: Int
     , name: String
@@ -138,13 +138,13 @@ update msg model =
       --Made a change on line 138 that adjusted for the infromation being put into the dictionary
             { model | containers = model.containers |> Dict.insert containerId { name = "Container", color = Util.randomColorString (Random.initialSeed model.autoIncrement), controllerId = controllerId, cpuShare = 128, memory = 4000, ioops = 128, isSSD = False, persistentStorage = 0, bandwidth = 20, showExtraMemory = False }, daemons = daemons, autoIncrement = containerId + 1 }
 
-        AddDaemon containerId ->
+        AddDaemon containerId -> 
             { model | daemons = model.daemons |> Dict.insert model.autoIncrement {name = "Daemon", containerId = containerId, cpuShare = 0, memory = 0}, autoIncrement = generateId model }
 
         DeleteContainer containerId ->
             { model | containers = model.containers |> Dict.remove containerId }
 
-        DeleteDaemon daemonId ->
+        DeleteDaemon daemonId -> 
             { model | daemons = model.daemons |> Dict.remove daemonId }
 
         DeleteController controllerId ->
@@ -183,6 +183,7 @@ update msg model =
         ChangeClusterName id value ->
             { model | clusters = Dict.update id (Maybe.map (\cluster -> { cluster | name = value })) model.clusters }
 
+
 view : Model -> Html Msg
 view model =
     div [ class "px-3", class "pt-1" ]
@@ -194,8 +195,8 @@ view model =
         , hr [] []
         , ListGroup.custom
             [ simpleListItem "Filters" FeatherIcons.filter [ href "settings" ]
-            , simpleListItem "Export JSON" FeatherIcons.share [ href "#" ]
-            , simpleListItem "Load JSON" FeatherIcons.download [ href "#" ]
+            , simpleListItem "Generate Pod File" FeatherIcons.download [ href "export" ]
+            , simpleListItem "Generate Configuration File" FeatherIcons.download [ href "load" ]
             ]
         ]
 
