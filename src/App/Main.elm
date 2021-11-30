@@ -1,7 +1,7 @@
 module App.Main exposing (..)
 
 import App.Cluster as Cluster
-import App.Configuration as Configuration
+import App.Configuration as Configuration exposing (..)
 import App.Nodes as Nodes
 import App.Container as Container
 import App.Results as Results
@@ -315,15 +315,15 @@ viewDetail model =
 viewImportDetail : Model -> Html Msg
 viewImportDetail model =
     let
-        servicesList = Dict.toList model.configuration.services
+        controllersList = Dict.toList model.configuration.controllers
         containersList = Dict.toList model.configuration.containers
         daemonsList = Dict.toList model.configuration.daemons
     in
         pre [ class "text-muted align-middle" ]
             [
                 text "Copy the below configuration to a text file so that you can \nreturn to your work at a later time.\n\n"
-                , text "\nServices:\n"
-                , span [] (List.map printServices servicesList)
+                , text "\nControllers:\n"
+                , span [] (List.map printControllers controllersList)
                 , text "\nContainers:\n"
                 , span [] (List.map printContainers containersList)
                 , text "\nDaemons:\n"
@@ -334,25 +334,25 @@ viewImportDetail model =
             ]
 
 
-printServices : (Int, Service) -> Html Msg
-printServices service =
+printControllers : (Int, Controller) -> Html Msg
+printControllers controller =
     pre [class "text-muted align-middle"]
         [
-            text ("- name: " ++ (second service).name ++ "\n")
-            , text ("  scaling-target: " ++ (String.fromInt (second service).scalingTarget) ++ "\n")
-            , text ("  packing-strategy: " ++  (printVariant (second service)).varType ++ "\n")
-            , text ("  min-tasks: " ++ (String.fromInt (second service).minTasks) ++ "\n")
-            , text ("  max-tasks: " ++ (String.fromInt (second service).maxTasks) ++ "\n")
-            , text ("  nominal-tasks: " ++ (String.fromInt (second service).nominalTasks) ++ "\n")
+            text ("- name: " ++ (second controller).name ++ "\n")
+            , text ("  scaling-target: " ++ (String.fromInt (second controller).scalingTarget) ++ "\n")
+            , text ("  packing-strategy: " ++  (printVariant (second controller)).varType ++ "\n")
+            , text ("  min-pods: " ++ (String.fromInt (second controller).minPods) ++ "\n")
+            , text ("  nominal-pods: " ++ (String.fromInt (second controller).nominalPods) ++ "\n")
+            , text ("  max-pods: " ++ (String.fromInt (second controller).maxPods) ++ "\n")
         ]
 
 
-printVariant : Service -> {varType:String}
-printVariant service =
+printVariant : Controller -> {varType:String}
+printVariant controller =
     let
         x = {varType = ""}
     in
-        case service.packingStrategy of
+        case controller.packingStrategy of
             Configuration.ByCPUShares ->
                 {x | varType = "By CPU Shares"}
 
@@ -368,10 +368,11 @@ printContainers container =
         , text ("  cpuShare: " ++ (String.fromInt (second container).cpuShare) ++ "m\n")
         , text ("  memory: " ++ (String.fromInt (second container).memory) ++ "Mi\n")
         , text ("  IOOPs: " ++ (String.fromInt (second container).ioops) ++ "\n")
-        , text ("    use-elastic-block-storage: " ++ (printBool (second container).useEBS) ++ "\n")
+        , text ("  persistent-storage: " ++ (String.fromInt (second container).persistentStorage) ++ "-disks\n")
+        , text ("    use-elastic-block-storage: " ++ (printBool (second container).isSSD) ++ "\n")
         , text ("  bandwidth: " ++ (String.fromInt (second container).bandwidth) ++ "Gi\n")
-        , text ("  service-id: " ++ (String.fromInt (second container).serviceId) ++ "\n")
-        -- TODO add service name to avoid confusion
+        , text ("  controller-id: " ++ (String.fromInt (second container).controllerId) ++ "\n")
+        -- TODO add controller name to avoid confusion?
     ]
 
 
@@ -403,7 +404,7 @@ viewExportDetail model =
 
         pre [ class "text-muted align-middle" ]
             [
-                text "This template is to help you create Kubernetes Pod and Deployment files.\nAll container information is presented in yaml format below.\n\n---\napiVersion: v1\nkind: Pod\nmetadata:\n  name: <ENTER NAME>\nspec:\n  containers:"
+                text "This template is to help you create Kubernetes Pod and Deployment files.\nAll Pod information is presented in yaml format below.\n\n---\napiVersion: v1\nkind: Pod\nmetadata:\n  name: <ENTER NAME>\nspec:\n  containers:"
                 , span [] (List.map yamlPrintCont contsList)
                 , text "---"
             ]
